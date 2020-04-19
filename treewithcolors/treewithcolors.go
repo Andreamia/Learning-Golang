@@ -1,4 +1,4 @@
-// draw a multi-colored decorated Christmas tree by symbols in console
+// draw a multi-colored decorated Christmas tree by symbols in terminal
 // install "github.com/fatih/color" package before run: go get github.com/fatih/color
 
 package main

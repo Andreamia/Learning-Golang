@@ -1,3 +1,6 @@
+// draw a multi-colored decorated Christmas tree by symbols in console
+// install "github.com/fatih/color" package before run: go get github.com/fatih/color
+
 package main
 
 import (
@@ -8,22 +11,23 @@ import (
 
 func main() {
 
-	var height int = 20
-	var width int = height*2 + 1
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
-			if j < (width/2 - i) {
+	var height int = 20          // tree height
+	var width int = height*2 + 1 // tree width
+
+	for h := 0; h < height; h++ {
+		for w := 0; w < width; w++ {
+			if w < (width/2 - h) {
 				fmt.Print(" ")
 			} else {
-				if j > (width/2 + i) {
+				if w > (width/2 + h) {
 					fmt.Print(" ")
 				} else {
-					if j == width/2-1 || j == width/2 || j == width/2+1 {
+					if w == width/2-1 || w == width/2 || w == width/2+1 {
 						color.Set(color.FgMagenta)
 						fmt.Print("|")
 						color.Unset()
 					} else {
-						if j%5 == 0 {
+						if w%5 == 0 {
 							color.Set(color.FgRed)
 							fmt.Print("+")
 							color.Unset()

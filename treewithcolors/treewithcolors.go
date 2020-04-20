@@ -9,6 +9,14 @@ import (
 	"github.com/fatih/color"
 )
 
+// print character with colour
+func printColoredCharacter(character string, colour color.Attribute) {
+	color.Set(colour)
+	fmt.Print(character)
+	color.Unset()
+}
+
+//program execution
 func main() {
 
 	var height int = 20          // tree height
@@ -23,20 +31,12 @@ func main() {
 					fmt.Print(" ")
 				} else {
 					if w == width/2-1 || w == width/2 || w == width/2+1 {
-						color.Set(color.FgMagenta)
-						fmt.Print("|")
-						color.Unset()
+						printColoredCharacter("|", color.FgMagenta)
 					} else {
 						if w%5 == 0 {
-							color.Set(color.FgRed)
-							fmt.Print("+")
-							color.Unset()
-
+							printColoredCharacter("+", color.FgRed)
 						} else {
-							color.Set(color.FgGreen)
-							fmt.Print("*")
-							color.Unset()
-
+							printColoredCharacter("*", color.FgGreen)
 						}
 					}
 				}

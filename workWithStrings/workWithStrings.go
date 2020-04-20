@@ -22,36 +22,41 @@ import (
 
 func analyze(stroka, openSymbol, closeSymbol string) {
 
-	var stack []string // array for stack of opening symbols
-	var index int = 0  // index for opening symbols in stack
-	var result string  // result with analysis of opening and closing symbols order
+	var counter int = 0 // counter for opening symbols from stroka string
+	var result string   // result with analysis of opening and closing symbols order
 
 	for _, char := range stroka {
 		switch string(char) {
 		case openSymbol:
 			{
-				stack = append(stack, string(char))
-				index++
+				counter++
 			}
 		case closeSymbol:
 			{
-				if index == 0 || stack[index-1] != openSymbol {
+				if counter != 0 {
+					counter--
+				} else {
 					result = "INCORRECT"
 					goto AnalysisResult
-				} else {
-					index--
 				}
 			}
 		}
 
 	}
-	if index != 0 {
-		result = "INCORRECT"
-	} else {
+	if counter == 0 {
 		result = "CORRECT"
+	} else {
+		result = "INCORRECT"
 	}
 AnalysisResult:
-	fmt.Println("Order of", openSymbol, "and", closeSymbol, "in string is ", result, "!")
+	fmt.Println("Order of", openSymbol, "and", closeSymbol, "in string is", result, "!")
+}
+
+// print symbol with character ANCII code with colour
+func printColoredCharacter(character rune, colour color.Attribute) {
+	color.Set(colour)
+	fmt.Print(string(character))
+	color.Unset()
 }
 
 // colorize opening and closing symbols in the string
@@ -62,15 +67,14 @@ AnalysisResult:
 //   closeSymbol - closing symbol for analysis
 func colorize(stroka, openSymbol, closeSymbol string) {
 
-	var stack []string                         // array for stack of opening symbols
-	var index int = 0                          // index for opening symbols in stack
-	var colors []color.Attribute               // array with colors for opening and closing symbols
-	var colorsClosingNonPair []color.Attribute // array with colors for non-pair closing symbols
-	var count int = 0                          // index for non-pair closing symbols
+	var counter int = 0 // counter for opening symbols from stroka string
+	var index int = 0   // index for non-pair closing symbols
 
+	var colors []color.Attribute // array with colors for opening and closing symbols
 	colors = append(colors, color.FgRed, color.FgBlue, color.FgYellow,
 		color.FgCyan, color.FgMagenta, color.FgGreen)
 
+	var colorsClosingNonPair []color.Attribute // array with colors for non-pair closing symbols
 	colorsClosingNonPair = append(colorsClosingNonPair, color.FgHiBlue, color.FgHiYellow,
 		color.FgHiCyan, color.FgHiMagenta, color.FgHiGreen, color.FgHiRed)
 
@@ -79,24 +83,17 @@ func colorize(stroka, openSymbol, closeSymbol string) {
 		switch string(char) {
 		case openSymbol:
 			{
-				stack = append(stack, string(char))
-				color.Set(colors[index%6])
-				fmt.Print(string(char))
-				color.Unset()
-				index++
+				printColoredCharacter(char, colors[counter%6])
+				counter++
 			}
 		case closeSymbol:
 			{
-				if index == 0 || stack[index-1] != openSymbol {
-					color.Set(colorsClosingNonPair[count%6])
-					fmt.Print(string(char))
-					color.Unset()
-					count++
+				if counter != 0 {
+					printColoredCharacter(char, colors[(counter-1)%6])
+					counter--
 				} else {
-					color.Set(colors[(index-1)%6])
-					fmt.Print(string(char))
-					color.Unset()
-					index--
+					printColoredCharacter(char, colorsClosingNonPair[index%6])
+					index++
 				}
 			}
 		default:
@@ -108,45 +105,63 @@ func colorize(stroka, openSymbol, closeSymbol string) {
 	}
 }
 
+// check is character ANCII code corresponds to ANCII code of upper case english letter or not
+func isUpperCase(character rune) bool {
+	return character >= 65 && character <= 90
+}
+
+// check is character ANCII code corresponds to ANCII code of lower case english letter or not
+func isLowerCase(character rune) bool {
+	return character >= 97 && character <= 122
+}
+
+// return ANCII code of upper case english letter corresponding to
+// ANCII code of character lower case english letter
+func changedToUpperCase(character rune) rune {
+	return character - 32
+}
+
 // find the longest string part in alphabetical order of english alphabet
 // upper and lower case of characters is ignored
 func findLongestAlphabeticalPart(stroka string) {
-	var strArray []string
-	var runeArray []rune
-	var i int = 0
-	var strTemp1, strTemp2 string = "", ""
-	var temp1, temp2 rune = 0, 0
+
+	var index int = 0                      // index for stroka characters
+	var strArray []string                  // array with characters from stroka string
+	var runeArray []rune                   // array with ANCII codes of characters from stroka string
+	var strTemp1, strTemp2 string = "", "" // variables for composing and finding the longest substring in alphabetical order
+	var temp1, temp2 rune = 0, 0           // variables for comparing ANCII codes from runeArray
 
 	for _, char := range stroka {
 		runeArray = append(runeArray, char)
 		strArray = append(strArray, string(char))
-		temp1 = runeArray[i]
-		if i != 0 {
-			temp2 = runeArray[i-1]
+		temp1 = runeArray[index]
+		if index != 0 {
+			temp2 = runeArray[index-1]
 		}
-		if temp1 >= 97 && temp1 <= 122 {
-			temp1 = temp1 - 32
+		if isLowerCase(temp1) {
+			temp1 = changedToUpperCase(temp1)
 		}
-		if temp2 >= 97 && temp2 <= 122 {
-			temp2 = temp2 - 32
+		if isLowerCase(temp2) {
+			temp2 = changedToUpperCase(temp2)
 		}
-		if temp1 >= 65 && temp1 <= 90 {
-			if i == 0 {
+		if isUpperCase(temp1) {
+			if index == 0 {
 				strTemp1 = strArray[0]
 			} else if temp1 > temp2 {
-				strTemp1 += strArray[i]
+				strTemp1 += strArray[index]
 			}
 			if len(strTemp2) < len(strTemp1) {
 				strTemp2 = strTemp1
 			}
 			if temp1 < temp2 {
-				strTemp1 = strArray[i]
+				strTemp1 = strArray[index]
 			}
 		} else {
 			strTemp1 = ""
 		}
-		i++
+		index++
 	}
+
 	if len(strTemp2) < len(strTemp1) {
 		strTemp2 = strTemp1
 	}
